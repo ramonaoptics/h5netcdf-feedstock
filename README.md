@@ -14,9 +14,7 @@ Summary: netCDF4 via h5py.
 Current build status
 ====================
 
-Linux: [![Circle CI](https://circleci.com/gh/conda-forge/h5netcdf-feedstock.svg?style=shield)](https://circleci.com/gh/conda-forge/h5netcdf-feedstock)
-OSX: [![TravisCI](https://travis-ci.org/conda-forge/h5netcdf-feedstock.svg?branch=master)](https://travis-ci.org/conda-forge/h5netcdf-feedstock)
-Windows: [![AppVeyor](https://ci.appveyor.com/api/projects/status/github/conda-forge/h5netcdf-feedstock?svg=True)](https://ci.appveyor.com/project/conda-forge/h5netcdf-feedstock/branch/master)
+All platforms: [![Circle CI](https://circleci.com/gh/conda-forge/h5netcdf-feedstock.svg?style=shield)](https://circleci.com/gh/conda-forge/h5netcdf-feedstock)
 
 Current release info
 ====================
