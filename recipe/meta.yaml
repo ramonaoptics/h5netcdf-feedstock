@@ -1,4 +1,4 @@
-{% set version = "0.5.0" %}
+{% set version = "0.5.1" %}
 
 package:
   name: h5netcdf
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/h/h5netcdf/h5netcdf-{{ version }}.tar.gz
-  sha256: 9c6bf9ed7e5b3d719afb041ca6193182084c9d8c2d3e1d6b2b1148f08bc729b2
+  sha256: 9ad8fdfdb5e30297302b1d7d4d7619aacf416523dcf6bea70020c7044e9ae3d4
 
 build:
   number: 0
