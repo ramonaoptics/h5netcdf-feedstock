@@ -14,12 +14,15 @@ Summary: netCDF4 via h5py.
 Current build status
 ====================
 
-All platforms: [![Circle CI](https://circleci.com/gh/conda-forge/h5netcdf-feedstock.svg?style=shield)](https://circleci.com/gh/conda-forge/h5netcdf-feedstock)
+All platforms:
+[![noarch](https://img.shields.io/circleci/project/github/conda-forge/h5netcdf-feedstock/master.svg?label=noarch)](https://circleci.com/gh/conda-forge/h5netcdf-feedstock)
 
 Current release info
 ====================
-Version: [![Anaconda-Server Badge](https://anaconda.org/conda-forge/h5netcdf/badges/version.svg)](https://anaconda.org/conda-forge/h5netcdf)
-Downloads: [![Anaconda-Server Badge](https://anaconda.org/conda-forge/h5netcdf/badges/downloads.svg)](https://anaconda.org/conda-forge/h5netcdf)
+
+| Name | Downloads | Version | Platforms |
+| --- | --- | --- | --- |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-h5netcdf-green.svg)](https://anaconda.org/conda-forge/h5netcdf) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/h5netcdf.svg)](https://anaconda.org/conda-forge/h5netcdf) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/h5netcdf.svg)](https://anaconda.org/conda-forge/h5netcdf) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/h5netcdf.svg)](https://anaconda.org/conda-forge/h5netcdf) |
 
 Installing h5netcdf
 ===================
