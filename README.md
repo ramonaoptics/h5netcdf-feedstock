@@ -3,11 +3,11 @@ About h5netcdf
 
 Home: https://github.com/shoyer/h5netcdf
 
-Package license: BSD 3-Clause
+Package license: BSD-3-Clause
 
 Feedstock license: BSD 3-Clause
 
-Summary: netCDF4 via h5py.
+Summary: Pythonic interface to netCDF4 via h5py
 
 
 
