@@ -11,7 +11,7 @@ source:
 build:
   number: 0
   noarch: python
-  script: python -m pip install --no-deps --ignore-installed .
+  script: "{{ PYTHON }} -m pip install . --no-deps -vv"
 
 requirements:
   build:
@@ -28,9 +28,9 @@ test:
 
 about:
   home: https://github.com/shoyer/h5netcdf
-  license: BSD 3-Clause
+  license: BSD-3-Clause
   license_file: LICENSE
-  summary: 'netCDF4 via h5py.'
+  summary: 'Pythonic interface to netCDF4 via h5py'
 
 extra:
   recipe-maintainers:
