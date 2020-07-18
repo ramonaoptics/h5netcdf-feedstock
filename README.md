@@ -5,7 +5,7 @@ Home: https://github.com/shoyer/h5netcdf
 
 Package license: BSD-3-Clause
 
-Feedstock license: BSD 3-Clause
+Feedstock license: BSD-3-Clause
 
 Summary: Pythonic interface to netCDF4 via h5py
 
@@ -118,6 +118,7 @@ Feedstock Maintainers
 
 * [@jhamman](https://github.com/jhamman/)
 * [@jjhelmus](https://github.com/jjhelmus/)
+* [@kmuehlbauer](https://github.com/kmuehlbauer/)
 * [@ocefpaf](https://github.com/ocefpaf/)
 * [@shoyer](https://github.com/shoyer/)
 
