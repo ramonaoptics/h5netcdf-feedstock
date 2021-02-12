@@ -115,7 +115,6 @@ Feedstock Maintainers
 =====================
 
 * [@jhamman](https://github.com/jhamman/)
-* [@jjhelmus](https://github.com/jjhelmus/)
 * [@kmuehlbauer](https://github.com/kmuehlbauer/)
 * [@ocefpaf](https://github.com/ocefpaf/)
 * [@shoyer](https://github.com/shoyer/)
