@@ -34,7 +34,7 @@ index 26ad0cf..59fb266 100644
      def create_group(self, name):
          if name.startswith("/"):
 -            return self._root.create_group(name[1:])
-+            return self._root.create_group(name[1:], track_order=self._track_order)
++            return self._root.create_group(name[1:])
          keys = name.split("/")
          group = self
          for k in keys[:-1]:
