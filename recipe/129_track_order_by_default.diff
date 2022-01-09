@@ -1,0 +1,168 @@
+diff --git a/h5netcdf/core.py b/h5netcdf/core.py
+index 26ad0cf..59fb266 100644
+--- a/h5netcdf/core.py
++++ b/h5netcdf/core.py
+@@ -403,6 +403,17 @@ class Group(Mapping):
+         # subclasses:
+         return self._root._h5file[self._h5path]
+ 
++    @property
++    def _track_order(self):
++        # TODO: make a suggestion to upstream to create a property
++        # for files to get if they track the order
++        # As of version 3.6.0 this property did not exist
++        from h5py.h5p import CRT_ORDER_TRACKED, CRT_ORDER_INDEXED
++        attr_creation_order = self._h5group.id.get_create_plist().get_attr_creation_order()
++        order_tracked = bool(attr_creation_order & CRT_ORDER_TRACKED)
++        order_indexed = bool(attr_creation_order & CRT_ORDER_INDEXED)
++        return order_tracked and order_indexed
++
+     @property
+     def name(self):
+         return self._h5group.name
+@@ -434,7 +445,7 @@ class Group(Mapping):
+     def _create_child_group(self, name):
+         if name in self:
+             raise ValueError("unable to create group %r (name already exists)" % name)
+-        self._h5group.create_group(name)
++        self._h5group.create_group(name, track_order=self._track_order)
+         self._groups[name] = self._group_cls(self, name)
+         return self._groups[name]
+ 
+@@ -446,7 +457,7 @@ class Group(Mapping):
+ 
+     def create_group(self, name):
+         if name.startswith("/"):
+-            return self._root.create_group(name[1:])
++            return self._root.create_group(name[1:], track_order=self._track_order)
+         keys = name.split("/")
+         group = self
+         for k in keys[:-1]:
+@@ -510,7 +521,8 @@ class Group(Mapping):
+                 del self._h5group[h5name]
+ 
+         self._h5group.create_dataset(
+-            h5name, shape, dtype=dtype, data=data, fillvalue=fillvalue, **kwargs
++            h5name, shape, dtype=dtype, data=data, fillvalue=fillvalue,
++            track_order=self._track_order, **kwargs
+         )
+ 
+         self._variables[h5name] = self._variable_cls(self, h5name, dimensions)
+@@ -576,7 +588,8 @@ class Group(Mapping):
+                 if self._dim_sizes[dim] is None:
+                     kwargs["maxshape"] = (None,)
+                 self._h5group.create_dataset(
+-                    name=dim, shape=(size,), dtype=">f4", **kwargs
++                    name=dim, shape=(size,), dtype=">f4",
++                    track_order=self._track_order, **kwargs
+                 )
+ 
+             h5ds = self._h5group[dim]
+@@ -711,8 +724,16 @@ class Group(Mapping):
+ 
+ class File(Group):
+     def __init__(
+-        self, path, mode=None, invalid_netcdf=False, phony_dims=None, **kwargs
++        self, path, mode=None, invalid_netcdf=False, phony_dims=None,
++        *, track_order=True, **kwargs
+     ):
++        # 2022/01/09
++        # netCDF4 wants the track_order parameter to be true
++        # through this might be getting relaxed in a more recent version of the
++        # standard
++        # https://github.com/Unidata/netcdf-c/issues/2054
++        # https://github.com/h5netcdf/h5netcdf/issues/128
++
+         # Deprecating mode='a' in favor of mode='r'
+         # If mode is None default to 'a' and issue a warning
+         if mode is None:
+@@ -741,10 +762,10 @@ class File(Group):
+                         self._preexisting_file = True
+                     except IOError:
+                         self._preexisting_file = False
+-                    self._h5file = h5pyd.File(path, mode, **kwargs)
++                    self._h5file = h5pyd.File(path, mode, track_order=track_order, **kwargs)
+                 else:
+                     self._preexisting_file = os.path.exists(path) and mode != "w"
+-                    self._h5file = h5py.File(path, mode, **kwargs)
++                    self._h5file = h5py.File(path, mode, track_order=track_order, **kwargs)
+             else:  # file-like object
+                 if h5py.__version__ < LooseVersion("2.9.0"):
+                     raise TypeError(
+@@ -753,7 +774,7 @@ class File(Group):
+                     )
+                 else:
+                     self._preexisting_file = mode in {"r", "r+", "a"}
+-                    self._h5file = h5py.File(path, mode, **kwargs)
++                    self._h5file = h5py.File(path, mode, track_order=track_order, **kwargs)
+         except Exception:
+             self._closed = True
+             raise
+diff --git a/h5netcdf/tests/test_h5netcdf.py b/h5netcdf/tests/test_h5netcdf.py
+index 29c1201..bde3ad0 100644
+--- a/h5netcdf/tests/test_h5netcdf.py
++++ b/h5netcdf/tests/test_h5netcdf.py
+@@ -1079,8 +1079,8 @@ def test_reading_special_datatype_created_with_c_api(tmp_local_netcdf):
+         pass
+ 
+ 
+-def test_nc4_non_coord(tmp_local_netcdf):
+-    with h5netcdf.File(tmp_local_netcdf, "w") as f:
++def test_nc4_non_coord_track_order_false(tmp_local_netcdf):
++    with h5netcdf.File(tmp_local_netcdf, "w", track_order=False) as f:
+         f.dimensions = {"x": None, "y": 2}
+         f.create_variable("test", dimensions=("x",), dtype=np.int64)
+         f.create_variable("y", dimensions=("x",), dtype=np.int64)
+@@ -1090,6 +1090,19 @@ def test_nc4_non_coord(tmp_local_netcdf):
+         assert list(f.variables) == ["y", "test"]
+         assert list(f._h5group.keys()) == ["_nc4_non_coord_y", "test", "x", "y"]
+ 
++def test_nc4_non_coord_track_order_true(tmp_local_netcdf):
++    # Track order True is the new default for versions after 0.12.0
++    # 0.12.0 defaults to `track_order=False`
++    with h5netcdf.File(tmp_local_netcdf, "w") as f:
++        f.dimensions = {"x": None, "y": 2}
++        f.create_variable("test", dimensions=("x",), dtype=np.int64)
++        f.create_variable("y", dimensions=("x",), dtype=np.int64)
++
++    with h5netcdf.File(tmp_local_netcdf, "r") as f:
++        assert f.dimensions == {"x": None, "y": 2}
++        assert list(f.variables) == ["test", "y"]
++        assert list(f._h5group.keys()) == ["x", "y", "test", "_nc4_non_coord_y"]
++
+ 
+ def test_overwrite_existing_file(tmp_local_netcdf):
+     # create file with _NCProperties attribute
+@@ -1196,3 +1209,32 @@ def test_no_circular_references(tmp_local_netcdf):
+     gc.collect()
+     with h5netcdf.File(tmp_local_netcdf, "r") as ds:
+         assert len(gc.get_referrers(ds)) == 1
++
++
++def test_creation_with_h5netcdf_edit_with_netcdf4(tmp_local_netcdf):
++    # In version 0.12.0, the wrong file creation attributes were used
++    # making netcdf4 unable to open files created by h5netcdf
++    # https://github.com/h5netcdf/h5netcdf/issues/128
++    with h5netcdf.File(tmp_local_netcdf, 'w') as the_file:
++        the_file.dimensions = {'x': 5}
++        variable = the_file.create_variable('hello', ('x',), float)
++        variable[...] = 5
++
++    with netCDF4.Dataset(tmp_local_netcdf, mode="a") as the_file:
++        variable = the_file['hello']
++        np.testing.assert_array_equal(variable[...].data, 5)
++        # Edit an existing variable
++        variable[:3] = 2
++
++        # Create a new variable
++        variable = the_file.createVariable('goodbye', float, ('x',))
++        variable[...] = 10
++
++    with h5netcdf.File(tmp_local_netcdf, 'a') as the_file:
++        # Ensure edited variable is consistent with the expected data
++        variable = the_file['hello']
++        np.testing.assert_array_equal(variable[...].data, [2, 2, 2, 5, 5])
++
++         # Ensure new variable is accessible
++        variable = the_file['goodbye']
++        np.testing.assert_array_equal(variable[...].data, 10)

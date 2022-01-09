@@ -2,14 +2,17 @@
 
 package:
   name: h5netcdf
-  version: {{ version }}
+  version: {{ version }}.post1
 
 source:
   url: https://pypi.io/packages/source/h/h5netcdf/h5netcdf-{{ version }}.tar.gz
   sha256: 6d3623f9ea46747249333792f13b515d05ff652dcec1ee436fa969bee03a8dd5
+  patches:
+    - 129_track_order_by_default.diff
+    - 0.12.0.post1_version_bump.patch
 
 build:
-  number: 0
+  number: 100
   noarch: python
   script: {{ PYTHON }} -m pip install . --no-deps -vv
 
@@ -17,7 +20,6 @@ requirements:
   host:
     - python >=3
     - pip
-    - h5py
   run:
     - python >=3
     - h5py
