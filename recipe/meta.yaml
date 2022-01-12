@@ -34,6 +34,7 @@ about:
 
 extra:
   recipe-maintainers:
+    - hmaarrfk
     - jhamman
     - ocefpaf
     - shoyer
